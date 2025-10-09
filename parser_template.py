@@ -38,12 +38,12 @@ class Parser:
         Bereinigt eine Zeile, indem Leerzeichen und Kommentare entfernt werden.
         Gibt None zurück, wenn die Zeile leer oder ein Kommentar ist.
         '''
-        # 1. Entferne Whitespaces
-        #dein Code hier
+        line = line.replace(" ", "")
 
-        # 2. Ignoriere Kommentare und leere Zeilen
-        #dein Code hier
-        return line
+        if len(line) == 0 or line.startswith("//"):
+            return None
+        else:
+            return line
     
     def return_type(self, line:str)->str:
         ''''
@@ -72,10 +72,10 @@ class Parser:
         for line in self.raw_lines:
             cleaned_line = self.clean_line(line)
             if not cleaned_line is None: #skip comments and empty lines
-                type = self.return_type(cleaned_line)
-                if type == 'A': #A-Befehl
+                type_ = self.return_type(cleaned_line)
+                if type_ == 'A': #A-Befehl
                     pass
                     #dein Code hier
-                elif type == 'C':
+                elif type_ == 'C':
                     self.lines[line_number] = cleaned_line
                     line_number += 1

@@ -6,10 +6,9 @@ print("--- Skript gestartet ---", flush=True)
 
 # 1. Prüfen, ob der Dateiname als Argument übergeben wurde
 if len(sys.argv) < 2:
-    print("Usage: python3 parser.py <filename>")
-    sys.exit(1)
-# Der Dateiname ist das erste Argument nach dem Skriptnamen
-filename = sys.argv[1]
+    filename = input("Dateipfad angeben: ")
+else:# Der Dateiname ist das erste Argument nach dem Skriptnamen
+    filename = sys.argv[1]
 
 # Datei öffnen und Fehler abfangen
 try:
