@@ -48,13 +48,22 @@ class Parser:
         else:
             return line
     
-    def return_type(self, line:str)->str:
+    def return_type(self, line: str)->str:
         '''
         Bestimmt den Typ einer Anweisung.
         Gibt 'A' für A-Befehle, 'C' für C-Befehle und 'L' für Labels zurück.
         '''
         if line.startswith("@"):
-			pass
+			try:
+				if int(line[1:]) <= 24576:
+					x = True
+				else:
+					x = False
+			if x == True or line[1:] in self.symbols.keys():
+				return "A"
+			else:
+				return "L"
+				
 		else:
 			return "C"
 
