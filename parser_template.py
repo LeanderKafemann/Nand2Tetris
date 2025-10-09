@@ -64,8 +64,9 @@ class Parser:
         for line in self.raw_lines:
             cleaned_line = self.clean_line(line)
             if not cleaned_line is None: 
-                pass
-                #dein Code hier
+                if return_type(line) == "L":
+					a[line.rstrip("@")] = 16 + line_number
+					line_number += 1
             
     def replace_symbols(self)->None:
         '''
