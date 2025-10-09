@@ -53,7 +53,10 @@ class Parser:
         Bestimmt den Typ einer Anweisung.
         Gibt 'A' für A-Befehle, 'C' für C-Befehle und 'L' für Labels zurück.
         '''
-        return None
+        if line.startswith("@"):
+			pass
+		else:
+			return "C"
 
     def add_labels(self)->None:
         '''
