@@ -1,3 +1,15 @@
 *.md linguist-language=Markdown
 *.md linguist-detectable=true
 *.md linguist-documentation=false
+
+*.pyw linguist-language=Python
+
+*.txt linguist-language=Text
+*.txt linguist-detectable=true
+
+*.asm linguist-language=Assembly
+
+*.hdl linguist-language=VHDL
+*.hdl linguist-documentation=false
+
+*.tst linguist-language=VHDL
