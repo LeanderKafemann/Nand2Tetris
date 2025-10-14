@@ -10,6 +10,7 @@
 *.asm linguist-language=Assembly
 
 *.hdl linguist-language=VHDL
+*.hdl linguist-detectable=true
 *.hdl linguist-documentation=false
 
 *.tst linguist-language=VHDL
