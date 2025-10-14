@@ -6,6 +6,7 @@
 
 *.txt linguist-language=Text
 *.txt linguist-detectable=true
+*.txt linguist-documentation=false
 
 *.asm linguist-language=Assembly
 
@@ -14,3 +15,5 @@
 *.hdl linguist-documentation=false
 
 *.tst linguist-language=VHDL
+
+*.cmp linguist-language=VHDL
