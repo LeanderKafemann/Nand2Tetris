@@ -1,4 +1,5 @@
 //Devides R0 by R1 and saves result in R2 and rest in R3
+//Also works for any combination of negative and positive numbers
 
 @R2
 M=0
