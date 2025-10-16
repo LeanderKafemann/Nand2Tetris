@@ -21,8 +21,6 @@ D;JLE
 @m
 M=M-1
 
-@n
-M=M+1
 
 @2
 D=A
@@ -36,10 +34,6 @@ D=A
 M=D
 
 (SMALLLOOP)
-@q
-D=M
-@BIGLOOP
-D;JLE
 @p
 D=M
 @MEDIUMLOOP
@@ -55,12 +49,15 @@ M=M-1
 0;JMP
 
 (MEDIUMLOOP)
+@q
+M=M-1
+D=M
+@BIGLOOP
+D;JLE
 @16
 D=A
 @n
 M=D+M
-@q
-M=M-1
 @TINYLOOP
 0;JMP
 
