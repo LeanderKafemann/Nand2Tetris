@@ -1,4 +1,5 @@
-from parser import Parser
+from . import parser_template
+Parser = parser_template.Parser
 
 DEBUG = True    #Debug Modus
 
@@ -24,63 +25,49 @@ class Instructions:
         '''
         Übersetzt einen A-Befehl in Maschinencode.
         '''
-        # ersetze mit deinem Code
-        return None
-    
+        # Entferne das @ und wandle die Zahl in eine 15-Bit-Binärzahl um
+        value = int(line[1:])
+        return '0' + format(value, '015b')
+
     def assemble_C(self, line:str)->str:
         ''''
         Übersetzt einen C-Befehl in Maschinencode.
-        Hinweise:
         '''
-        c_str = '111'
-
+        # Tabellen für comp, dest, jmp
+        comp_table = {
+            '0':   '101010', '1':   '111111', '-1':  '111010',
+            'D':   '001100', 'A':   '110000', '!D':  '001101',
+            '!A':  '110001', '-D':  '001111', '-A':  '110011',
+            'D+1': '011111', 'A+1': '110111', 'D-1': '001110',
+            'A-1': '110010', 'D+A': '000010', 'D-A': '010011',
+            'A-D': '000111', 'D&A': '000000', 'D|A': '010101',
+        }
+        comp_table_M = {k.replace('A','M'):v for k,v in comp_table.items() if 'A' in k}
+        comp_table.update({k:v for k,v in comp_table_M.items()})
+        dest_table = {
+            None:  '000', 'M':   '001', 'D':   '010', 'MD':  '011',
+            'A':   '100', 'AM':  '101', 'AD':  '110', 'AMD': '111',
+        }
+        jmp_table = {
+            None:  '000', 'JGT': '001', 'JEQ': '010', 'JGE': '011',
+            'JLT': '100', 'JNE': '101', 'JLE': '110', 'JMP': '111',
+        }
+        # Zerlege die Zeile in dest, comp, jmp
+        dest, comp, jmp = None, None, None
         if '=' in line:
             dest, rest = line.split('=')
         else:
-            #dein Code hier
-            pass
+            rest = line
         if ';' in rest:
-            #dein Code hier
-            pass
+            comp, jmp = rest.split(';')
         else:
-            #dein Code hier
-            pass
-
-        #hier verwenden wir einen elagenten Weg, 
-        #um dest in Binärwerte umzuwandeln:
-        # 7 = 111
-        # 6 = 110
-        # usw.
-        dest_val = 0
-        if not dest is None:
-            if "A" in dest:
-                dest_val += 4
-            if "D" in dest:
-                #dein Code hier
-                pass
-        # umwandeln von in 3-Bit Binärstring    
-        dest_str = format(dest_val, '03b')
-
-        jmp_str = '000'
-        if not jmp is None:
-            if jmp == "JGT":
-                jmp_str = '001'
-            #dein Code hier
-
-        a_str = '0'  # a=0 for A, a=1 for M
-        comp_str = '000000'
-        if 'M'in comp:
-            a_str = '1'
-            comp = comp.replace('M', 'A')  
-        if comp == "0":
-            comp_str = '101010'
-        elif comp == "1":
-            #dein Code hier
-            pass
-        else:
-            raise ValueError(f"Unbekannter Comp-Wert: {comp}") 
-    
-        return None
+            comp = rest
+        # a-Bit bestimmen
+        a = '1' if 'M' in comp else '0'
+        comp_bits = comp_table.get(comp.replace('M','A'), '000000')
+        dest_bits = dest_table.get(dest, '000')
+        jmp_bits = jmp_table.get(jmp, '000')
+        return '111' + a + comp_bits + dest_bits + jmp_bits
            
     def write(self, filename:str)->None:
         full_name = filename.replace('.asm', '.hack')

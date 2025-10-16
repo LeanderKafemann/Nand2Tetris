@@ -6,9 +6,9 @@ class Parser:
             print("Initializing Parser...")
         self.file = file                    #Dateiobjekt
         self.raw_lines = file.readlines()   #Speichert die originalen Zeilen der Datei
-        self.lines = {}                     #Dictionary für die bereinigten Zeilen
+        self.lines = {}                     #Dictionary fï¿½r die bereinigten Zeilen
         self.symbols = self.predefined_symbols()    #Liste aller Symbole
-        self.current_address = 16           #Erste freie Adresse für Variable
+        self.current_address = 16           #Erste freie Adresse fï¿½r Variable
         self.parse()                        #Starte den Parsing Prozess   
 
     def print(self):
@@ -19,12 +19,12 @@ class Parser:
 
     def predefined_symbols(self):
         """
-		Vordefinierte Symbole.
-		"""
-        return {'R0': 0, 'R1': 1, 'R2': 2, 'R3': 3, 'R4': 4, 'R5': 5,\
-			'R6': 6, 'R7': 7, 'R8': 8, 'R9': 9, 'R10': 10, 'R11': 11,\
-	        'R12': 12, 'R13': 13, 'R14': 14, 'R15': 15, 'LOOP' : 10, 'END' : 23,\
-	        'SCREEN' : 16384, 'KBD' : 24576}
+        Vordefinierte Symbole.
+        """
+        return {'R0': 0, 'R1': 1, 'R2': 2, 'R3': 3, 'R4': 4, 'R5': 5,
+            'R6': 6, 'R7': 7, 'R8': 8, 'R9': 9, 'R10': 10, 'R11': 11,
+            'R12': 12, 'R13': 13, 'R14': 14, 'R15': 15, 'LOOP' : 10, 'END' : 23,
+            'SCREEN' : 16384, 'KBD' : 24576}
                         
     def parse(self)->None:
         if DEBUG:
@@ -35,10 +35,10 @@ class Parser:
         self.replace_symbols()
 
     def clean_line(self, line:str)->str|None:
-        '''
+        """
         Bereinigt eine Zeile, indem Leerzeichen und Kommentare entfernt werden.
-        Gibt None zurück, wenn die Zeile leer oder ein Kommentar ist.
-        '''
+        Gibt None zurï¿½ck, wenn die Zeile leer oder ein Kommentar ist.
+        """
         line = line.replace(" ", "")
 
         if len(line) == 0 or line.startswith("//"):
@@ -47,10 +47,10 @@ class Parser:
             return line
     
     def return_type(self, line: str)->str:
-        '''
+        """
         Bestimmt den Typ einer Anweisung.
-        Gibt 'A' für A-Befehle, 'C' für C-Befehle und 'L' für Labels zurück.
-        '''
+        Gibt 'A' fï¿½r A-Befehle, 'C' fï¿½r C-Befehle und 'L' fï¿½r Labels zurï¿½ck.
+        """
         if line.startswith("@"):
             try:
                 if int(line[1:]) <= 24576:
@@ -63,11 +63,11 @@ class Parser:
                 else:
                     return "L"
         else:
-	        return "C"
+            return "C"
 
     def add_labels(self) -> None:
         """
-        Erster Durchlauf: Fügt Labels zur Symboltabelle hinzu und speichert die
+        Erster Durchlauf: Fï¿½gt Labels zur Symboltabelle hinzu und speichert die
         Adressen der Anweisungen.
         """
         line_number = 0
@@ -79,9 +79,9 @@ class Parser:
                     line_number += 1
 
     def replace_symbols(self) -> None:
-        '''
+        """
         Zweiter Durchlauf: Ersetzt Symbole durch Adressen.
-        '''
+        """
         line_number = 0
         for line in self.raw_lines:
             cleaned_line = self.clean_line(line)
