@@ -6,9 +6,9 @@ class Parser:
             print("Initializing Parser...")
         self.file = file                    #Dateiobjekt
         self.raw_lines = file.readlines()   #Speichert die originalen Zeilen der Datei
-        self.lines = {}                     #Dictionary fÃ¼r die bereinigten Zeilen
+        self.lines = {}                     #Dictionary für die bereinigten Zeilen
         self.symbols = self.predefined_symbols()    #Liste aller Symbole
-        self.current_address = 16           #Erste freie Adresse fÃ¼r Variable
+        self.current_address = 16           #Erste freie Adresse für Variable
         self.parse()                        #Starte den Parsing Prozess   
 
     def print(self):
@@ -37,7 +37,7 @@ class Parser:
     def clean_line(self, line:str)->str|None:
         '''
         Bereinigt eine Zeile, indem Leerzeichen und Kommentare entfernt werden.
-        Gibt None zurÃ¼ck, wenn die Zeile leer oder ein Kommentar ist.
+        Gibt None zurück, wenn die Zeile leer oder ein Kommentar ist.
         '''
         line = line.replace(" ", "")
 
@@ -49,36 +49,36 @@ class Parser:
     def return_type(self, line: str)->str:
         '''
         Bestimmt den Typ einer Anweisung.
-        Gibt 'A' fÃ¼r A-Befehle, 'C' fÃ¼r C-Befehle und 'L' fÃ¼r Labels zurÃ¼ck.
+        Gibt 'A' für A-Befehle, 'C' für C-Befehle und 'L' für Labels zurück.
         '''
         if line.startswith("@"):
             try:
                 if int(line[1:]) <= 24576:
-                	x = True
+                    x = True
                 else:
                     x = False
             finally:
-			    if x == True or line[1:] in self.symbols.keys():
-				    return "A"
-			    else:
-				    return "L"
-		else:
-			return "C"
+                if x == True or line[1:] in self.symbols.keys():
+                    return "A"
+                else:
+                    return "L"
+        else:
+	        return "C"
 
-    def add_labels(self)->None:
-        '''
-        Erster Durchlauf: FÃ¼gt Labels zum Symboltabelle hinzu und speichert die
+    def add_labels(self) -> None:
+        """
+        Erster Durchlauf: Fügt Labels zur Symboltabelle hinzu und speichert die
         Adressen der Anweisungen.
-        '''
+        """
         line_number = 0
         for line in self.raw_lines:
             cleaned_line = self.clean_line(line)
             if not cleaned_line is None: 
-                if self.return_type(line) == "L":
-					a[line.rstrip("@")] = 16 + line_number
-					line_number += 1
-            
-    def replace_symbols(self)->None:
+                if self.return_type(line) == "L": #Fehler Wolf! self fehlte
+                    self.symbols[line.rstrip("@")] = 16 + line_number
+                    line_number += 1
+
+    def replace_symbols(self) -> None:
         '''
         Zweiter Durchlauf: Ersetzt Symbole durch Adressen.
         '''
