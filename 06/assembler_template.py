@@ -7,8 +7,11 @@ print("--- Skript gestartet ---", flush=True)
 # 1. Prüfen, ob der Dateiname als Argument übergeben wurde
 if len(sys.argv) < 2:
     filenames = [input("Dateipfad angeben: ")]
+    if os.path.isdir(filenames[0]):
+        dir_path = filenames[0]
+        filenames = [os.path.join(dir_path, f) for f in os.listdir(dir_path) if f.endswith('.asm')]
 else:# Der Dateiname ist das erste Argument nach dem Skriptnamen
-    if os.path.isdir(sys.arvv[1]):
+    if os.path.isdir(sys.argv[1]):
         dir_path = sys.argv[1]
         filenames = [os.path.join(dir_path, f) for f in os.listdir(dir_path) if f.endswith('.asm')]
     else:

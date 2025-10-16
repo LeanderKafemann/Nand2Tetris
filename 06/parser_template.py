@@ -57,6 +57,8 @@ class Parser:
                     x = True
                 else:
                     x = False
+            except:
+                x = False
             finally:
                 if x == True or line[1:] in self.symbols.keys():
                     return "A"
