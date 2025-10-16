@@ -1,6 +1,6 @@
 import sys
-from . import parser_template as p
-from . import instructions_template as i
+import parser_template as p
+import instructions_template as i
 
 print("--- Skript gestartet ---", flush=True) 
 

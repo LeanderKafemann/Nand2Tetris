@@ -16,3 +16,7 @@
 
 *.tst linguist-language=VHDL
 *.cmp linguist-language=VHDL
+
+*.hack linguist-language=hack
+*.hack linguist-detectable=true
+*.hack linguist-documentation=false

@@ -1,4 +1,4 @@
-from . import parser_template
+import parser_template
 Parser = parser_template.Parser
 
 DEBUG = True    #Debug Modus
