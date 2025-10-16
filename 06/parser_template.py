@@ -18,15 +18,13 @@ class Parser:
         #dein Code hier
 
     def predefined_symbols(self):
-		"""
+        """
 		Vordefinierte Symbole.
 		"""
-        return {
-            'R0': 0, 'R1': 1, 'R2': 2, 'R3': 3, 'R4': 4, 'R5': 5,\
+        return {'R0': 0, 'R1': 1, 'R2': 2, 'R3': 3, 'R4': 4, 'R5': 5,\
 			'R6': 6, 'R7': 7, 'R8': 8, 'R9': 9, 'R10': 10, 'R11': 11,\
-	        'R12': 12, 'R13': 13, 'R14': 14, 'R15': 15, 'LOOP' : 10, 'END' : 23\
-	        'SCREEN' : 16384, 'KBD' : 24576,
-            }
+	        'R12': 12, 'R13': 13, 'R14': 14, 'R15': 15, 'LOOP' : 10, 'END' : 23,\
+	        'SCREEN' : 16384, 'KBD' : 24576}
                         
     def parse(self)->None:
         if DEBUG:
@@ -54,16 +52,16 @@ class Parser:
         Gibt 'A' für A-Befehle, 'C' für C-Befehle und 'L' für Labels zurück.
         '''
         if line.startswith("@"):
-			try:
-				if int(line[1:]) <= 24576:
-					x = True
-				else:
-					x = False
-			if x == True or line[1:] in self.symbols.keys():
-				return "A"
-			else:
-				return "L"
-				
+            try:
+                if int(line[1:]) <= 24576:
+                	x = True
+                else:
+                    x = False
+            finally:
+			    if x == True or line[1:] in self.symbols.keys():
+				    return "A"
+			    else:
+				    return "L"
 		else:
 			return "C"
 
@@ -76,7 +74,7 @@ class Parser:
         for line in self.raw_lines:
             cleaned_line = self.clean_line(line)
             if not cleaned_line is None: 
-                if return_type(line) == "L":
+                if self.return_type(line) == "L":
 					a[line.rstrip("@")] = 16 + line_number
 					line_number += 1
             
