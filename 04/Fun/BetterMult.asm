@@ -1,4 +1,4 @@
-//Multiplicates R1 and R2.
+//Multiplicates R0 and R1 and saves the product in R2.
 //Can also multiplicate any combination of negative and positive Numbers.
 
 //Set RAM[2] to 0
