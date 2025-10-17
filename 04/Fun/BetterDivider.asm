@@ -75,20 +75,13 @@ M=1
 0;JMP
 
 (DNEG)
-(LOOP4)
-@m
-D=M
 @n
-D=D-M
-@REST
-D;JLT
+M=-M
 @m
-D=M
-@n
-M=M-D
-@R2
-M=M+1
-@LOOP4
+M=-M
+@o
+M=1
+@LOOP1
 0;JMP
 
 (REST)
