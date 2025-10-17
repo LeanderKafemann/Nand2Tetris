@@ -13,9 +13,9 @@ class Parser:
 
     def print(self):
         print("------- Symbols -------")
-        #dein Code hier
+        print(self.symbols)
         print("------- Lines -------")
-        #dein Code hier
+        print(self.lines)
 
     def predefined_symbols(self):
         """
