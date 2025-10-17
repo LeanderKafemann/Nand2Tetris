@@ -72,6 +72,10 @@ M=D+M
 D=A
 @r
 M=D
+@14
+D=A
+@n
+M=M-D
 
 (BLACK)
 @r
@@ -84,7 +88,7 @@ M=M-1
 D=A
 @s
 M=D
-@16
+@2
 D=A
 @n
 M=M-D
@@ -135,11 +139,10 @@ M=M-1
 D=A
 @s
 M=D
-@12
+@2
 D=A
 @n
-M=M-D
-
+M=D+M
 
 (WHITELOOP)
 @4
@@ -160,7 +163,7 @@ M=D+M
 (MINIWHITELOOP)
 @x
 D=M
-@WHITELOOP
+@BLACKLOOP
 D;JLE
 @n
 A=M
@@ -173,9 +176,8 @@ D=A
 M=D+M
 @x
 M=M-1
-@MINIWHITELOOP
+@MINIBLACKLOOP
 0;JMP
-
 
 (END)
 @END
