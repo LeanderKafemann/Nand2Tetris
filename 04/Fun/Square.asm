@@ -114,8 +114,13 @@ M=M-D
 M=M+1
 @y
 D=M
+@x
+D=D-M
+@GONE
+D;JLE
 @LOOPF
-D;JGT
+0;JMP
+(GONE)
 @l
 D=M
 @l2
@@ -452,24 +457,31 @@ M=M-1
 D=M
 @m3
 M=D
+@32
+D=A
+@n
+M=M-D
 
 (LOOP3)
 @m3
-D=M
-@AEND
-D;JLE
-@leftrest
+M=M+1
+(LOOP3B)
+@rightrest
 D=M
 @n
 A=M
 M=D
+@m3
+M=M-1
+@m3
+D=M
+@AEND
+D;JLE
 @32
 D=A
 @n
 M=D+M
-@m3
-M=M-1
-@LOOP3
+@LOOP3B
 0;JMP
 
 (AEND)
@@ -477,7 +489,7 @@ M=M-1
 M=M+1
 @l2
 D=M
-@FINAL
+@FINAL1
 D;JLE
 @m2
 D=M
@@ -485,11 +497,8 @@ D=M
 M=D
 @m4
 M=D
-@2
-D=A
 @l2
-M=M-D
-
+M=M-1
 
 (LOOP4)
 @m3
@@ -525,12 +534,15 @@ M=M-1
 @LOOP5
 0;JMP
 
+(FINAL1)
+@m2
+M=M+1
 (FINAL)
 @m2
 D=M
 @END
 D;JLE
-@rightrest
+@leftrest
 D=M
 @n
 A=M
