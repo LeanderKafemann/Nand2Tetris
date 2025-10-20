@@ -33,6 +33,12 @@ D=M
 D=D-A
 @END
 D;JLE
+@R0
+D=M
+@128
+D=D-A
+@END
+D;JGT
 @SCREEN
 D=A
 @3631
