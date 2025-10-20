@@ -78,7 +78,7 @@ M=M-1
 D=A
 @n
 M=D
-@4144
+@4143
 D=A
 @n
 M=D+M
@@ -94,6 +94,7 @@ M=D
 @m2
 M=D
 M=D+M
+M=M-1
 
 //Fallunterscheidung für link-rechts-Bewegung
 @16
@@ -127,6 +128,8 @@ D=M
 @l2
 M=D
 M=D+M
+@l
+M=M-1
 @y
 D=M
 @rest
