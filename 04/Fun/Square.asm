@@ -87,7 +87,7 @@ M=D+M
 @R0
 D=M
 @m
-M=D-1
+M=D
 D=M
 @l
 M=D
@@ -118,7 +118,7 @@ D=M
 @x
 D=D-M
 @GONE
-D;JLE
+D;JLT
 @LOOPF
 0;JMP
 (GONE)
