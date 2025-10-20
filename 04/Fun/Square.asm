@@ -41,7 +41,7 @@ D=D-A
 D;JGT
 @SCREEN
 D=A
-@3631
+@3599
 D=D+A
 @n
 M=D
@@ -78,7 +78,7 @@ M=M-1
 D=A
 @n
 M=D
-@4145
+@4144
 D=A
 @n
 M=D+M
