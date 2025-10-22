@@ -26,3 +26,37 @@ M=M-1
 0;JMP
 
 (GO)
+//save radius in RAM[m], RAM[l], RAM[o]
+@R0
+D=M
+@END
+D;JLE
+@128
+D=D-A
+@END
+D;JLE
+@R0
+D=M
+@m
+M=D
+@l
+M=D
+@o
+M=D
+
+//save middlepoint in RAM[n]
+@SCREEN
+D=A
+@4111
+D=D+A
+@n
+M=D
+
+
+
+
+
+
+(END)
+@END
+0;JMP
