@@ -53,8 +53,22 @@ D=D+A
 M=D
 
 //Go to top middlepoint
-
+(LOOP1)
 @m
+M=M-1
+@32
+D=A
+@n
+M=M-D
+@m
+D=M
+@LOOP1
+D;JLE
+
+//define 16 seperate types of lines
+@16384
+@LR1
+
 
 
 
