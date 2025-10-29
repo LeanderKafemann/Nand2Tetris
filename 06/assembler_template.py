@@ -37,6 +37,8 @@ for filename in filenames:
     except FileNotFoundError:
         # 5. Fehlerbehandlung
         print(f"Error: Die Datei '{filename}' wurde nicht gefunden.")
-        sys.exit(1)
+    except Exception as e:
+        print(f"Ein Fehler ist aufgetreten: {e}")
 
     print("--- Verarbeitung abgeschlossen ---")
+input("Enter drücken zum Beenden...")
