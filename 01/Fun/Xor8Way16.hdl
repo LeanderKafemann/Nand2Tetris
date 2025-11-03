@@ -11,6 +11,20 @@ CHIP Xor8Way16 {
     OUT out;
 
 
-
+    Xor16(a =a , b =b , out =i );
+    Xor16(a =c , b =d , out =j );
+    Xor16(a =e , b =f , out =k );
+    Xor16(a =g , b =h , out =l );
+    
+    And16(a =a , b =b , out =m );
+    And16(a =c , b =e , out =n );
+    And16(a =e , b =f , out =o );
+    And16(a =g , b =h , out =p );
+    And16(a =m , b =n , out =q );
+    And16(a =o , b =p , out =r );
+    And16(a =q , b =r , out =s );
+    Or8Way16(a =m , b =n , c =o , d=p , e = q , f =r , g =s , h =false , out =t)
+    
+    
 
 }
