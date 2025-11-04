@@ -22,7 +22,10 @@ else:# Der Dateiname ist das erste Argument nach dem Skriptnamen
         filenames = [sys.argv[1]]
 
 print("Press Strg+c to cancel printing of to-be-assembled file now.")
-print_ = special_starter()
+print_ = False
+if special_starter(1000000000):
+    print("Short mode activated...")
+    print_ = True
 
 for filename in filenames:
     # Datei öffnen und Fehler abfangen
@@ -39,7 +42,9 @@ for filename in filenames:
             #Ergebniss des Parsers ausgeben -> Print Methode in parser.py anpassen
             #kann auch auskommentiert werden
             if print_:
-                instructions.DEBUG = False
+                i.DEBUG = False
+                p.DEBUG = False
+            else:
                 parser.print()
 
             #4. Schreibe den Maschinencode in eine .hack Datei
