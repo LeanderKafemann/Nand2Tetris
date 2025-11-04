@@ -1,0 +1,40 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/1/Xor8Way16.hdl
+/**
+ * 8-way Or gate: 
+ * out = a Or b Or ... Or p
+ */
+CHIP Xor8Way16 {
+    IN a[16], b[16], c[16], d[16], e[16], f[16] ,g[16] ,h[16] ;
+    OUT out;
+
+    Xor16(a =a , b =b , out =i );
+    Xor16(a =c , b =d , out =j );
+    Xor16(a =e , b =f , out =k );
+    Xor16(a =g , b =h , out =l );
+    Xor16(a =i , b =j , out =x );
+    Xor16(a =k , b =l , out =y );
+    Xor16(a =x , b =y , out =z );
+    Xor8Way(a =z[0] , b =z[1] , c =z[2] , d =z[3] , e =z[4] , f =z[5] , g =z[6] , h =z[7] , out =z1);
+    Xor8Way(a =z[8] , b =z[9] , c =z[10] , d =z[11] , e =z[12] , f =z[13] , g =z[14] , h =z[15] , out =z2);
+    Xor(a =z1 , b z2 , out =z3);
+
+    And16(a =a , b =b , out =m );
+    And16(a =c , b =e , out =n );
+    And16(a =e , b =f , out =o );
+    And16(a =g , b =h , out =p );
+    And16(a =m , b =n , out =q );
+    And16(a =o , b =p , out =r );
+    And16(a =q , b =r , out =s );
+    Or8Way16(a =m , b =n , c =o , d=p , e = q , f =r , g =s , h =false , out =t);
+    Or8Way(a =t[0] , b =t[1] , c =t[2] , d =t[3] , e =t[4] , f =t[5] , g =t[6] , h =t[7] , out =u);
+    Or8Way(a =t[8] , b =t[9] , c =t[10] , d =t[11] , e =t[12] , f =t[13] , g =t[14] , h =t[15] , out =v);
+    Or(a =u , b =v , out =w);
+
+    Not(in =w , out =nw);
+
+    And(a =z3 , b =nw , out =out);    
+
+}
