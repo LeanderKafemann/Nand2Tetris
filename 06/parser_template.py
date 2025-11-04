@@ -6,9 +6,9 @@ class Parser:
             print("Initializing Parser...")
         self.file = file                    #Dateiobjekt
         self.raw_lines = file.readlines()   #Speichert die originalen Zeilen der Datei
-        self.lines = {}                     #Dictionary f�r die bereinigten Zeilen
+        self.lines = {}                     #Dictionary für die bereinigten Zeilen
         self.symbols = self.predefined_symbols()    #Liste aller Symbole
-        self.current_address = 16           #Erste freie Adresse f�r Variable
+        self.current_address = 16           #Erste freie Adresse für Variable
         self.parse()                        #Starte den Parsing Prozess   
 
     def print(self):
@@ -37,61 +37,73 @@ class Parser:
     def clean_line(self, line:str)->str|None:
         """
         Bereinigt eine Zeile, indem Leerzeichen und Kommentare entfernt werden.
-        Gibt None zur�ck, wenn die Zeile leer oder ein Kommentar ist.
+        Gibt None zurück, wenn die Zeile leer oder ein Kommentar ist.
         """
+        # Kommentare entfernen (inkl. inline), Zeilenumbruch entfernen und Leerzeichen entfernen
+        line = line.split("//", 1)[0].strip()
         line = line.replace(" ", "")
-
-        if len(line) == 0 or line.startswith("//"):
+        if len(line) == 0:
             return None
-        else:
-            return line
+        return line
     
     def return_type(self, line: str)->str:
         """
         Bestimmt den Typ einer Anweisung.
-        Gibt 'A' f�r A-Befehle, 'C' f�r C-Befehle und 'L' f�r Labels zur�ck.
+        Gibt 'A' für A-Befehle (z.B. @123 oder @symbol),
+        'L' für Labels (z.B. (LOOP)) und 'C' für C-Befehle zurück.
         """
         if line.startswith("@"):
-            try:
-                if int(line[1:]) <= 24576:
-                    x = True
-                else:
-                    x = False
-            except:
-                x = False
-            finally:
-                if x == True or line[1:] in self.symbols.keys():
-                    return "A"
-                else:
-                    return "L"
-        else:
-            return "C"
+            return "A"
+        if line.startswith("(") and line.endswith(")"):
+            return "L"
+        return "C"
 
     def add_labels(self) -> None:
         """
-        Erster Durchlauf: F�gt Labels zur Symboltabelle hinzu und speichert die
+        Erster Durchlauf: Fügt Labels zur Symboltabelle hinzu und speichert die
         Adressen der Anweisungen.
         """
         line_number = 0
-        for line in self.raw_lines:
-            cleaned_line = self.clean_line(line)
-            if not cleaned_line is None: 
-                if self.return_type(line) == "L": #Fehler Wolf! self fehlte
-                    self.symbols[line.rstrip("@")] = 16 + line_number
-                    line_number += 1
+        for raw in self.raw_lines:
+            cleaned_line = self.clean_line(raw)
+            if cleaned_line is None:
+                continue
+            t = self.return_type(cleaned_line)
+            if t == "L":
+                # Label: (LABEL) -> symbol = LABEL, Adresse = aktuelle Instr.-Adresse
+                symbol = cleaned_line[1:-1]
+                self.symbols[symbol] = line_number
+            else:
+                # A- oder C-Befehl erhöht die Instr.-Adresse
+                line_number += 1
 
     def replace_symbols(self) -> None:
         """
         Zweiter Durchlauf: Ersetzt Symbole durch Adressen.
+        Speichert bereinigte / ersetzte A- und C-Anweisungen in self.lines mit
+        aufsteigender Instr.-Adresse als Schlüssel.
         """
         line_number = 0
-        for line in self.raw_lines:
-            cleaned_line = self.clean_line(line)
-            if not cleaned_line is None: #skip comments and empty lines
-                type_ = self.return_type(cleaned_line)
-                if type_ == 'A': #A-Befehl
-                    pass
-                    #dein Code hier
-                elif type_ == 'C':
-                    self.lines[line_number] = cleaned_line
-                    line_number += 1
+        for raw in self.raw_lines:
+            cleaned_line = self.clean_line(raw)
+            if cleaned_line is None:
+                continue
+            type_ = self.return_type(cleaned_line)
+            if type_ == 'A':  # A-Befehl
+                symbol = cleaned_line[1:]
+                if symbol.isdigit():
+                    address = int(symbol)
+                else:
+                    if symbol in self.symbols:
+                        address = self.symbols[symbol]
+                    else:
+                        # neue Variable -> erste freie Adresse verwenden
+                        address = self.current_address
+                        self.symbols[symbol] = address
+                        self.current_address += 1
+                # Speichere als numerische A-Anweisung (bereinigt)
+                self.lines[line_number] = f"@{address}"
+                line_number += 1
+            elif type_ == 'C':
+                self.lines[line_number] = cleaned_line
+                line_number += 1

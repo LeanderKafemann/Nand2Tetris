@@ -3,6 +3,7 @@ import parser_template as p
 import instructions_template as i
 
 print("--- Skript gestartet ---", flush=True) 
+print("Thanks for using EasyAssembler v0.3.0 Copyright LeanderKafemann + NotGhostpro 2025")
 
 # 1. Prüfen, ob der Dateiname als Argument übergeben wurde
 if len(sys.argv) < 2:
