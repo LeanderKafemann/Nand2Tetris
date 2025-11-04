@@ -32,13 +32,16 @@ for filename in filenames:
             print(f"--- Parser for '{filename}' ---")
             #2. Erzeuge ein Parser Objekt
             parser = p.Parser(file)
-            #Ergebniss des Parsers ausgeben -> Print Methode in parser.py anpassen
-            #kann auch auskommentiert werden
-            if print_:
-                parser.print()
 
             #3. Erzeuge ein Instructions Objekt
             instructions = i.Instructions(parser)
+
+            #Ergebniss des Parsers ausgeben -> Print Methode in parser.py anpassen
+            #kann auch auskommentiert werden
+            if print_:
+                instructions.DEBUG = False
+                parser.print()
+
             #4. Schreibe den Maschinencode in eine .hack Datei
             instructions.write(filename)
 
