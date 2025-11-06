@@ -20,3 +20,6 @@
 *.hack linguist-language=HackAssembly
 *.hack linguist-detectable=true
 *.hack linguist-documentation=false
+
+*.vm linguist-language=WebAssembly
+*.vm linguist-detectable=true
