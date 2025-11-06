@@ -1,7 +1,7 @@
 import os
 
-import parser_template
-Parser = parser_template.Parser
+import parser
+Parser = parser.Parser
 
 DEBUG = True    #Debug Modus
 
@@ -97,7 +97,7 @@ class Instructions:
         return '111' + a_bit + comp_bits + dest_bits + jmp_bits
 
     def write(self, filename:str)->None:
-        full_name = filename.replace('.asm', '.hack')
+        full_name = filename.replace('.vm', '.asm')
         if os.path.exists(full_name):
             print(f"Hack file at {full_name} was overwritten.")
         with open(full_name, 'w') as file:
