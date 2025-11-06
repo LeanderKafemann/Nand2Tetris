@@ -6,7 +6,7 @@ import instructions_template as i
 from naturalsize import special_starter
 
 print("--- Skript gestartet ---", flush=True) 
-print("Thanks for using EasyAssembler v0.3.0 Copyright LeanderKafemann + NotGhostpro 2025")
+print("Thanks for using EasyAssembler v1.0.0 Copyright LeanderKafemann + NotGhostpro 2025")
 
 # 1. Prüfen, ob der Dateiname als Argument übergeben wurde
 if len(sys.argv) < 2:
@@ -23,7 +23,7 @@ else:# Der Dateiname ist das erste Argument nach dem Skriptnamen
 
 print("Press Strg+c to cancel printing of to-be-assembled file now.")
 print_ = False
-if special_starter(1000000000):
+if special_starter():
     print("Short mode activated...")
     print_ = True
 
