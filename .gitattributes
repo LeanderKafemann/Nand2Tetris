@@ -23,3 +23,7 @@
 
 *.vm linguist-language=WebAssembly
 *.vm linguist-detectable=true
+
+*.yml linguist-language=YAML
+*.yml linguist-detectable=true
+*.yml linguist-generated=false
