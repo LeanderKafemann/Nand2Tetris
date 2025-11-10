@@ -3,9 +3,12 @@ name: Assemble
 on:
   workflow_dispatch:
   push:
+    # Trigger bei Änderungen an relevanten Ordnern oder an .asm Dateien (ohne 'hrist 04')
     paths:
       - 'vier/**'
       - '.github/workflows/assemble.yml'
+      - '**/*.asm'
+      - '**/autoAssemble.bool'
 
 jobs:
   assemble:
@@ -14,18 +17,29 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Read autoAssemble flag
+      - name: Read autoAssemble flags
         id: check
         run: |
-          # If file exists, read and normalize (trim + lowercase); otherwise default to "false"
-          if [ -f vier/autoAssemble.bool ]; then
-            val=$(tr -d '[:space:]' < vier/autoAssemble.bool || echo "false")
-          else
-            val="false"
+          # Suche nach allen autoAssemble.bool Dateien (außer in .git)
+          flags_found=false
+          should_run=false
+          while IFS= read -r -d '' file; do
+            flags_found=true
+            # Lese Datei, entferne Whitespace, normalize to lowercase
+            val=$(tr -d '[:space:]' < "$file" || echo "false")
+            val=$(echo "$val" | tr '[:upper:]' '[:lower:]')
+            echo "Found $file -> '$val'"
+            if [ "$val" = "true" ]; then
+              should_run=true
+              break
+            fi
+          done < <(find . -path './.git' -prune -o -type f -name 'autoAssemble.bool' -print0)
+
+          if [ "$flags_found" = "false" ]; then
+            echo "No autoAssemble.bool files found; defaulting to false"
           fi
-          # normalize to lowercase
-          val=$(echo "$val" | tr '[:upper:]' '[:lower:]')
-          if [ "$val" = "true" ]; then
+
+          if [ "$should_run" = "true" ]; then
             echo "should_run=true" >> "$GITHUB_OUTPUT"
           else
             echo "should_run=false" >> "$GITHUB_OUTPUT"
@@ -34,19 +48,27 @@ jobs:
       - name: Abort early if autoAssemble is not true
         if: steps.check.outputs.should_run != 'true'
         run: |
-          echo "vier/autoAssemble.bool is not 'true' — aborting assemble workflow early."
-          exit 0
+          echo "Kein autoAssemble.bool mit 'true' gefunden — Workflow bricht vor Assemblen ab."
 
-      - name: Set up Python (only if assembling)
+      - name: Set up Python
         if: steps.check.outputs.should_run == 'true'
         uses: actions/setup-python@v4
         with:
           python-version: '3.x'
 
-      - name: Run assembler
+      - name: Run assembler on all .asm files (recursive)
         if: steps.check.outputs.should_run == 'true'
         run: |
-          echo "Running assembler..."
-          # TODO: Ersetze die folgenden Zeilen durch die tatsächlichen Build-/Assemble-Befehle dieses Repos
-          # z.B. python assembler.py input.hack > output.hack
-          # oder make assemble
+          # Beispiel: rekursiv alle .asm Dateien finden (außer .github) und für jede Datei ein .hack ausgeben
+          found=false
+          while IFS= read -r -d '' asm; do
+            found=true
+            echo "Assembling: $asm"
+            # Ersetze die folgende Zeile durch den tatsächlichen Befehl des Projekts:
+            # z.B. python assembler.py "$asm" > "${asm%.asm}.hack"
+            echo "PLACEHOLDER: assemble $asm -> ${asm%.asm}.hack"
+          done < <(find . -path './.git' -prune -o -type f -name '*.asm' -print0)
+
+          if [ "$found" = "false" ]; then
+            echo "Keine .asm Dateien gefunden."
+          fi
