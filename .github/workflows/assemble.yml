@@ -1,42 +1,52 @@
-name: Assemble Project 4 Files
+name: Assemble
 
 on:
-  push:
-    branches: [ main, master ]
-  pull_request:
-    branches: [ main, master ]
   workflow_dispatch:
+  push:
+    paths:
+      - 'vier/**'
+      - '.github/workflows/assemble.yml'
 
 jobs:
   assemble:
     runs-on: ubuntu-latest
-    
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-      
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.x'
-        
-    - name: Install dependencies
-      run: |
-        cd 06
-        pip install -r requirements.txt
-        
-    - name: Assemble all .asm files from project 4
-      run: |
-        cd 06
-        # Find all .asm files in project 04 and assemble them
-        find ../04 -name "*.asm" -type f | while read asmfile; do
-          echo "Assembling: $asmfile"
-          # Use echo to provide Enter input to skip the final prompt
-          echo "" | python3 assembler_template.py "$asmfile"
-        done
-        
-    - name: Upload assembled .hack files
-      uses: actions/upload-artifact@v3
-      with:
-        name: assembled-hack-files
-        path: 04/**/*.hack
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Read autoAssemble flag
+        id: check
+        run: |
+          # If file exists, read and normalize (trim + lowercase); otherwise default to "false"
+          if [ -f vier/autoAssemble.bool ]; then
+            val=$(tr -d '[:space:]' < vier/autoAssemble.bool || echo "false")
+          else
+            val="false"
+          fi
+          # normalize to lowercase
+          val=$(echo "$val" | tr '[:upper:]' '[:lower:]')
+          if [ "$val" = "true" ]; then
+            echo "should_run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "should_run=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Abort early if autoAssemble is not true
+        if: steps.check.outputs.should_run != 'true'
+        run: |
+          echo "vier/autoAssemble.bool is not 'true' — aborting assemble workflow early."
+          exit 0
+
+      - name: Set up Python (only if assembling)
+        if: steps.check.outputs.should_run == 'true'
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Run assembler
+        if: steps.check.outputs.should_run == 'true'
+        run: |
+          echo "Running assembler..."
+          # TODO: Ersetze die folgenden Zeilen durch die tatsächlichen Build-/Assemble-Befehle dieses Repos
+          # z.B. python assembler.py input.hack > output.hack
+          # oder make assemble
