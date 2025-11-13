@@ -10,3 +10,13 @@ push constant 6969
 push static 4
 sub
 pop static 3
+push constant 787
+pop static 3
+push static 3
+push static 4
+add
+push constant 787
+eq
+pop temp 0
+push constant 13187
+pop temp 7
