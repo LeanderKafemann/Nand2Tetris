@@ -2,9 +2,6 @@ import sys, os
 import parser_template as p
 import instructions_template as i
 
-# requires naturalsize
-from naturalsize import special_starter
-
 print("--- Skript gestartet ---", flush=True) 
 print("Thanks for using EasyAssembler v1.0.0 Copyright LeanderKafemann + NotGhostpro 2025")
 
@@ -21,11 +18,7 @@ else:# Der Dateiname ist das erste Argument nach dem Skriptnamen
     else:
         filenames = [sys.argv[1]]
 
-print("Press Strg+c to cancel printing of to-be-assembled file now.")
 print_ = False
-if special_starter():
-    print("Short mode activated...")
-    print_ = True
 
 for filename in filenames:
     # Datei öffnen und Fehler abfangen
