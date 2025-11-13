@@ -1,5 +1,9 @@
 name: Assemble
 
+# Allow the workflow to push the output file back into the repo
+permissions:
+  contents: write
+
 on:
   workflow_dispatch:
   push:
@@ -16,11 +20,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          persist-credentials: true
 
       - name: Read autoAssemble flags
         id: check
         run: |
-          # Suche nach allen autoAssemble.bool Dateien (außer in .git)
           flags_found=false
           should_run=false
           while IFS= read -r -d '' file; do
@@ -62,22 +67,39 @@ jobs:
         with:
           python-version: '3.x'
 
+      - name: Install dependencies (if needed)
+        if: steps.check.outputs.should_run == 'true'
+        run: |
+          # Falls 06/assembler_template.py Abhängigkeiten hat, hier installieren.
+          # Beispiel: pip install -r 06/requirements.txt
+          if [ -f 06/requirements.txt ]; then
+            pip install -r 06/requirements.txt
+          fi
+
       - name: Run assembler on all .asm files (recursive) and log output
         if: steps.check.outputs.should_run == 'true'
-        shell: bash -l {0}
+        shell: bash
         run: |
+          set -o pipefail
           found=false
-          # Rekursiv alle .asm Dateien finden (außer .git) und für jede Datei
+          failures=0
+          echo "Starting recursive assembly run" | tee -a 04/autoAssembleOut.output
+
+          # Für jede .asm Datei: übergebe Input-Pfad und expliziten Output-Pfad an assembler_template.py
           while IFS= read -r -d '' asm; do
             found=true
-            echo "====== Assembling: $asm ======" | tee -a 04/autoAssembleOut.output
-            # Übergibt den Pfad der .asm Datei an 06/assembler_template.py und protokolliert stdout+stderr
-            python3 06/assembler_template.py "$asm" 2>&1 | tee -a 04/autoAssembleOut.output
+            out="${asm%.asm}.hack"
+            echo "====== Assembling: $asm -> $out ======" | tee -a 04/autoAssembleOut.output
+
+            # Aufruf: übergebe input und output; passe die Argumentliste an, wenn assembler_template.py andere expects hat
+            # stdout+stderr werden in die Logdatei geschrieben
+            python3 06/assembler_template.py "$asm" "$out" 2>&1 | tee -a 04/autoAssembleOut.output
             status=${PIPESTATUS[0]}
+
             if [ $status -ne 0 ]; then
               echo "Assembler failed for $asm with exit code $status" | tee -a 04/autoAssembleOut.output
-              # Fehler zum Abbruch weiterreichen (optional: entferne das exit, wenn du fortsetzen willst)
-              exit $status
+              failures=$((failures+1))
+              # weitermachen, damit alle Dateien versucht werden; sammle Fehler
             else
               echo "Assembler succeeded for $asm" | tee -a 04/autoAssembleOut.output
             fi
@@ -87,7 +109,46 @@ jobs:
             echo "Keine .asm Dateien gefunden." | tee -a 04/autoAssembleOut.output
           fi
 
+          echo "Assembly summary: failures=$failures" | tee -a 04/autoAssembleOut.output
+
+          # Exit non-zero if any failures occurred
+          if [ $failures -ne 0 ]; then
+            echo "One or more assemblies failed." | tee -a 04/autoAssembleOut.output
+            # don't exit here: let the commit step still try to push logs back
+            echo "::set-output name=assembly_failed::true"
+          else
+            echo "::set-output name=assembly_failed::false"
+          fi
+
+      - name: Commit and push autoAssembleOut.output back to repository
+        if: steps.check.outputs.should_run == 'true'
+        run: |
+          # Configure git user so commit is attributed
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          # Only add the log file if it changed
+          git add 04/autoAssembleOut.output || true
+          if git diff --cached --quiet; then
+            echo "No changes to commit for 04/autoAssembleOut.output"
+          else
+            git commit -m "ci: update 04/autoAssembleOut.output (CI run at $(date -u))"
+            # Push back to the same branch that triggered the workflow (if push event) or to main for manual dispatch.
+            # For push events, $GITHUB_REF holds refs/heads/branch
+            ref=${GITHUB_REF##refs/heads/}
+            if [ "$GITHUB_EVENT_NAME" = "push" ] && [ -n "$ref" ]; then
+              git push origin "HEAD:$ref"
+            else
+              # For workflow_dispatch or others push to main (change if you prefer a different behavior)
+              git push origin HEAD:main
+            fi
+          fi
+
       - name: Final status
         if: steps.check.outputs.should_run == 'true'
         run: |
           echo "autoAssemble finished at $(date -u)" | tee -a 04/autoAssembleOut.output
+          if [ "${{ steps.run_assembler.outputs.assembly_failed }}" = "true" ]; then
+            echo "Some assemblies failed. Check 04/autoAssembleOut.output for details."
+            exit 1
+          fi
