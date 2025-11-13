@@ -3,9 +3,9 @@ name: Assemble
 on:
   workflow_dispatch:
   push:
-    # Trigger bei Änderungen an relevanten Ordnern oder an .asm Dateien (ohne 'hrist 04')
     paths:
-      - 'vier/**'
+      - '06/**'
+      - '04/**'
       - '.github/workflows/assemble.yml'
       - '**/*.asm'
       - '**/autoAssemble.bool'
@@ -25,7 +25,6 @@ jobs:
           should_run=false
           while IFS= read -r -d '' file; do
             flags_found=true
-            # Lese Datei, entferne Whitespace, normalize to lowercase
             val=$(tr -d '[:space:]' < "$file" || echo "false")
             val=$(echo "$val" | tr '[:upper:]' '[:lower:]')
             echo "Found $file -> '$val'"
@@ -50,25 +49,45 @@ jobs:
         run: |
           echo "Kein autoAssemble.bool mit 'true' gefunden — Workflow bricht vor Assemblen ab."
 
+      - name: Prepare output file in 04 (truncate/create)
+        if: steps.check.outputs.should_run == 'true'
+        run: |
+          mkdir -p 04
+          : > 04/autoAssembleOut.output
+          echo "autoAssemble run started at $(date -u)" | tee -a 04/autoAssembleOut.output
+
       - name: Set up Python
         if: steps.check.outputs.should_run == 'true'
         uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
+          python-version: '3.x'
 
-      - name: Run assembler on all .asm files (recursive)
+      - name: Run assembler on all .asm files (recursive) and log output
         if: steps.check.outputs.should_run == 'true'
+        shell: bash -l {0}
         run: |
-          # Beispiel: rekursiv alle .asm Dateien finden (außer .github) und für jede Datei ein .hack ausgeben
           found=false
+          # Rekursiv alle .asm Dateien finden (außer .git) und für jede Datei
           while IFS= read -r -d '' asm; do
             found=true
-            echo "Assembling: $asm"
-            # Ersetze die folgende Zeile durch den tatsächlichen Befehl des Projekts:
-            # z.B. python assembler.py "$asm" > "${asm%.asm}.hack"
-            echo "PLACEHOLDER: assemble $asm -> ${asm%.asm}.hack"
+            echo "====== Assembling: $asm ======" | tee -a 04/autoAssembleOut.output
+            # Übergibt den Pfad der .asm Datei an 06/assembler_template.py und protokolliert stdout+stderr
+            python3 06/assembler_template.py "$asm" 2>&1 | tee -a 04/autoAssembleOut.output
+            status=${PIPESTATUS[0]}
+            if [ $status -ne 0 ]; then
+              echo "Assembler failed for $asm with exit code $status" | tee -a 04/autoAssembleOut.output
+              # Fehler zum Abbruch weiterreichen (optional: entferne das exit, wenn du fortsetzen willst)
+              exit $status
+            else
+              echo "Assembler succeeded for $asm" | tee -a 04/autoAssembleOut.output
+            fi
           done < <(find . -path './.git' -prune -o -type f -name '*.asm' -print0)
 
           if [ "$found" = "false" ]; then
-            echo "Keine .asm Dateien gefunden."
+            echo "Keine .asm Dateien gefunden." | tee -a 04/autoAssembleOut.output
           fi
+
+      - name: Final status
+        if: steps.check.outputs.should_run == 'true'
+        run: |
+          echo "autoAssemble finished at $(date -u)" | tee -a 04/autoAssembleOut.output
