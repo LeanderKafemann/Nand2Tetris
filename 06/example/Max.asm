@@ -25,6 +25,3 @@
 (OUTPUT_D)
   @R2
   M=D
-(END)
-  @END
-  0;JMP
