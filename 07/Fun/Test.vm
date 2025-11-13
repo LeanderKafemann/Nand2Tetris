@@ -1,3 +1,12 @@
 push constant 787
 push constant 787
 add
+push constant 787
+and
+push constant 787
+sub
+pop static 4
+push constant 6969
+push static 4
+sub
+pop static 3
