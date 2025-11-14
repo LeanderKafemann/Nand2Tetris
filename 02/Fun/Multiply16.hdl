@@ -4,13 +4,22 @@
 // File name: projects/Fun/Multiply16.hdl
 /**
  * 16-bit Multiplier:
- * out = in * mult(0-8)
+ * out = in * mult(0-7)
  */
-CHIP Inc16 {
+CHIP Multiply16 {
     IN in[16] mult[3];
     OUT out[16];
 
     PARTS:
+    //Fälle
+    Not16(in = true , out = a);
+    Add16(a = in , b =false , out =b );
+    Add16(a = in, b = b, out = c);
+    Add16(a = in, b = c, out = d);
+    Add16(a = in, b = d, out = e);
+    Add16(a = in, b = e, out = f);
+    Add16(a = in, b = f, out = g);
+    Add16(a = in, b = g, out = h);
 
-
+    Mux8Way16(a = a , b = b , c = c , d = d , e = e , f = f , g = g , h = h , sel = mult , out out);
 }
