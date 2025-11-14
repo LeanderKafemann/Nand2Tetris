@@ -1,5 +1,38 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/Fun/Multiply16.hdl
+/**
+ * 16-bit Divider:
+ * out = in / div(0-7)
+ */
+CHIP Divide16 {
+    IN in[16] div[3];
+    OUT out[16] rest[3];
 
-    //Fälle
-    Not16(in = true , out a);
+    PARTS:
 
-    Mux8Way16(a = a , b = b , c = c , d = d , e = e , f = f , g = g , h = h , sel = mult , out = out);
+//Fälle
+
+Not16(in = true , out a);
+
+And16(a = in , b = true , out b);
+
+And(a = in[15] , b = true , out = c[14])
+And(a = in[14] , b = true , out = c[13])
+And(a = in[13] , b = true , out = c[12])
+And(a = in[12] , b = true , out = c[11])
+And(a = in[11] , b = true , out = c[10])
+And(a = in[10] , b = true , out = c[9])
+And(a = in[9] , b = true , out = c[8])
+And(a = in[8] , b = true , out = c[7])
+And(a = in[7] , b = true , out = c[6])
+And(a = in[6] , b = true , out = c[5])
+And(a = in[5] , b = true , out = c[4])
+And(a = in[4] , b = true , out = c[3])
+And(a = in[3] , b = true , out = c[2])
+And(a = in[2] , b = true , out = c[1])
+And(a = in[1] , b = true , out = c[0])
+And(a = in[0] , b = true , out = rest[0])
+
+Mux8Way16(a = a , b = b , c = c , d = d , e = e , f = f , g = g , h = h , sel = div , out = out);
