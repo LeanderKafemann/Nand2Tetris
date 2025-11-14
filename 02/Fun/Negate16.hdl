@@ -11,6 +11,7 @@ CHIP And {
     OUT out;
     
     PARTS:
+
 Not16(in = a , out = b);
 Inc16(in = b , out = out);
 
