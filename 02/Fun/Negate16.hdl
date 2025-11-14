@@ -6,9 +6,9 @@
  * Negate gate:
 if in = x: out = -x
  */
-CHIP And {
+CHIP Negate16 {
     IN a[16]
-    OUT out;
+    OUT out[16];
     
     PARTS:
 
