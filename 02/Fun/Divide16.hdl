@@ -60,15 +60,6 @@ And(a = in[0] , b = true , out = r4[0])
 
 
 //7
-Not(in = true , out = x1[16])
-Not(in = true , out = x2[16])
-Not(in = true , out = x3[16])
-Not(in = true , out = x4[16])
-Not(in = true , out = x5[16])
-Not(in = true , out = x6[16])
-Not(in = true , out = x7[16])
-Not(in = true , out = x8[16])
-Not(in = true , out = x[16])
 
 And(a = in[15] , b = true , out = x1[12] , out = x1[9] , out = x1[6] , out = x1[3] , out = x1[0]);
 And(a = in[14] , b = true , out = x1[11] , out = x1[8] , out = x1[5] , out = x1[2]);
@@ -90,9 +81,6 @@ Add16(a = x5 , b = x6 , out = x8);
 Add16(a = x7 , b = x8 , out = x , out[0..2] = z);
 Add16(a[0..2] = z , a[3..15] = false , b[0] = in[0] , b[1] = in [1] , b[2] = in[2] , b[3..15] = false , out[0..2] = r7 , out[3] = y , out[4...15] = idgaf);
 Add16(a = x , b[0] = y , b[1..15] = false , out = h );
-
-
-
 
 Mux8Way16(a = a , b = b , c = c , d = d , e = e , f = f , g = g , h = h , sel = div , out = out);
 Mux8Way16(a = r0 , b = r1 , c = r2 , d = r3 , e = r4 , f = r5 , g = r6 , h = r7 , sel = div , out = rest);
