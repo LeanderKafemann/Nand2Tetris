@@ -1,1 +1,16 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/Fun/Multiply16.hdl
+/**
+ * 16-bit Multiplier:
+ * out = in * mult(0-8)
+ */
+CHIP Inc16 {
+    IN in[16] mult[3];
+    OUT out[16];
 
+    PARTS:
+
+
+}
