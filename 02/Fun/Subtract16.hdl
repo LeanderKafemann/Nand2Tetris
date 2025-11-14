@@ -6,9 +6,9 @@
  * Subtract gate:
  * out = a-b 
  */
-CHIP And {
-    IN a, b;
-    OUT out;
+CHIP Subtract16 {
+    IN a[16], b[16];
+    OUT out[16];
     
     PARTS:
 
