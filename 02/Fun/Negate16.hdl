@@ -1,1 +1,17 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/Fun/Negate16.hdl
+/**
+ * Negate gate:
+if in = x: out = -x
+ */
+CHIP And {
+    IN a[16]
+    OUT out;
+    
+    PARTS:
+Not16(in = a , out = b);
+Inc16(in = b , out = out);
 
+}
