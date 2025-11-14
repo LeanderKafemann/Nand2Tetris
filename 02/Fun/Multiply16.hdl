@@ -11,6 +11,7 @@ CHIP Multiply16 {
     OUT out[16];
 
     PARTS:
+  
     //Fälle
     Not16(in = true , out = a);
     Add16(a = in , b =false , out =b );
@@ -22,4 +23,5 @@ CHIP Multiply16 {
     Add16(a = in, b = g, out = h);
 
     Mux8Way16(a = a , b = b , c = c , d = d , e = e , f = f , g = g , h = h , sel = mult , out out);
+
 }
