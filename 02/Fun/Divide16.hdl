@@ -35,4 +35,22 @@ And(a = in[2] , b = true , out = c[1])
 And(a = in[1] , b = true , out = c[0])
 And(a = in[0] , b = true , out = rest[0])
 
+And(a = in[15] , b = true , out = e[13])
+And(a = in[14] , b = true , out = e[12])
+And(a = in[13] , b = true , out = e[11])
+And(a = in[12] , b = true , out = e[10])
+And(a = in[11] , b = true , out = e[9])
+And(a = in[10] , b = true , out = e[8])
+And(a = in[9] , b = true , out = e[7])
+And(a = in[8] , b = true , out = e[6])
+And(a = in[7] , b = true , out = e[5])
+And(a = in[6] , b = true , out = e[4])
+And(a = in[5] , b = true , out = e[3])
+And(a = in[4] , b = true , out = e[2])
+And(a = in[3] , b = true , out = e[1])
+And(a = in[2] , b = true , out = e[0])
+And(a = in[1] , b = true , out = rest[1])
+And(a = in[0] , b = true , out = rest[0])
+
+
 Mux8Way16(a = a , b = b , c = c , d = d , e = e , f = f , g = g , h = h , sel = div , out = out);
