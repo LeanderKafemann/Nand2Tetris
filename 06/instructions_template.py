@@ -80,16 +80,36 @@ class Instructions:
         else:
             comp = rest
 
+        # Normalisiere: entferne unnötige Leerzeichen
+        dest = dest.strip()
+        comp = comp.strip()
+        jmp = jmp.strip()
+
         # Normalisiere dest: feste Reihenfolge A, D, M -> liefert z.B. 'AD' statt 'DA'
-        dest_norm = ''.join(ch for ch in 'ADM' if ch in dest)
+        dest_norm = ''.join(ch for ch in 'ADM' if ch in dest.replace(' ', ''))
 
-        # Bestimme a-Bit (1 falls M in comp vorkommt)
-        a_bit = '1' if 'M' in comp else '0'
-        comp_key = comp  # comp enthält bereits A oder M
+        # Bestimme comp-Key ohne Leerzeichen
+        comp_key = comp.replace(' ', '')
 
+        # Versuche direkten Lookup
         comp_bits = comp_table.get(comp_key)
+
+        # Fallback: falls kommutative Operatoren genutzt wurden, versuche getauschte Operanden
+        if comp_bits is None:
+            for op in ['+', '&', '|']:
+                if op in comp_key:
+                    a, b = comp_key.split(op, 1)
+                    swapped = b + op + a
+                    comp_bits = comp_table.get(swapped)
+                    if comp_bits is not None:
+                        comp_key = swapped
+                        break
+
         if comp_bits is None:
             raise ValueError(f"Unbekannter Comp-Wert: '{comp}' in Zeile '{line}'")
+
+        # Bestimme a-Bit (1 falls M in dem verwendeten comp-Key vorkommt)
+        a_bit = '1' if 'M' in comp_key else '0'
 
         dest_bits = dest_table.get(dest_norm, '000')
         jmp_bits = jmp_table.get(jmp, '000')
