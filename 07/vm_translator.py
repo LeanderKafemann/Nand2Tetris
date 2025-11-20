@@ -254,7 +254,7 @@ def translate_file(path: str) -> None:
                 command, segment, index = parts[0], parts[1], int(parts[2])
                 writer.write_push_pop(command, segment, index)
             else:
-                # Projekt 7 benötigt sonst nichts
+                # Projekt 7 benÃ¶tigt sonst nichts
                 writer.write_comment(f"unhandled: {parser.current_command}")
         writer.write_to_file(path)
         if DEBUG:
