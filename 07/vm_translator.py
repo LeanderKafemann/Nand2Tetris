@@ -276,6 +276,7 @@ def main() -> None:
             print(f"Translated: {vm}")
         except Exception as e:
             print(f"Fehler bei {vm}: {e}")
+    input("Press Enter to continue...")
 
 if __name__ == "__main__":
     main()
