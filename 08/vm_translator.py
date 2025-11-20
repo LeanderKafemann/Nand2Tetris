@@ -1,7 +1,7 @@
 """
-VM -> Hack ASM Translator (Projekt 7)
-Struktur orientiert an bestehenden Dateien (parser/instructions/translator).
-Erzeugt pro .vm Datei eine .asm Datei im selben Verzeichnis.
+VM -> Hack ASM Translator (Projekt 8)
+Unterstützt: arithmetic, push/pop, label, goto, if-goto, function, call, return
+Bei Verzeichnis-Input: erzeugt eine einzige .asm Datei und fügt Bootstrap (SP=256; call Sys.init) hinzu.
 """
 import sys
 import os
@@ -14,6 +14,12 @@ DEBUG = False
 C_ARITHMETIC = "C_ARITHMETIC"
 C_PUSH = "C_PUSH"
 C_POP = "C_POP"
+C_LABEL = "C_LABEL"
+C_GOTO = "C_GOTO"
+C_IF = "C_IF"
+C_FUNCTION = "C_FUNCTION"
+C_RETURN = "C_RETURN"
+C_CALL = "C_CALL"
 
 class VMParser:
     def __init__(self, file: TextIO) -> None:
@@ -53,6 +59,18 @@ class VMParser:
             return C_PUSH
         if cmd == "pop":
             return C_POP
+        if cmd == "label":
+            return C_LABEL
+        if cmd == "goto":
+            return C_GOTO
+        if cmd == "if-goto":
+            return C_IF
+        if cmd == "function":
+            return C_FUNCTION
+        if cmd == "call":
+            return C_CALL
+        if cmd == "return":
+            return C_RETURN
         return C_ARITHMETIC
 
     def arg1(self) -> Optional[str]:
@@ -60,6 +78,8 @@ class VMParser:
             return None
         t = self.command_type()
         parts = self.current_command.split()
+        if t == C_RETURN:
+            return None
         if t == C_ARITHMETIC:
             return parts[0]
         if len(parts) >= 2:
@@ -80,6 +100,7 @@ class CodeWriter:
         self.asm_lines = []
         self._label_counter = itertools.count()
         self.current_vm_file = "Static"  # default prefix for static vars
+        self.current_function = ""       # for function-scoped labels
 
     def set_file_name(self, filename: str) -> None:
         base = os.path.basename(filename)
@@ -98,6 +119,11 @@ class CodeWriter:
     # Helper: pop stack into D
     def _pop_to_d(self) -> None:
         self.asm_lines += ["@SP", "AM=M-1", "D=M"]
+
+    def _full_label(self, label: str) -> str:
+        if self.current_function:
+            return f"{self.current_function}${label}"
+        return label
 
     def write_arithmetic(self, command: str) -> None:
         self.write_comment(f"arithmetic {command}")
@@ -225,8 +251,83 @@ class CodeWriter:
 
         raise NotImplementedError(f"Unbekannter Befehl: {command}")
 
-    def write_to_file(self, vm_filename: str) -> None:
-        asm_filename = vm_filename.replace(".vm", ".asm")
+    # Flow commands
+    def write_label(self, label: str) -> None:
+        full = self._full_label(label)
+        self.write_comment(f"label {label}")
+        self.asm_lines.append(f"({full})")
+
+    def write_goto(self, label: str) -> None:
+        full = self._full_label(label)
+        self.write_comment(f"goto {label}")
+        self.asm_lines += [f"@{full}", "0;JMP"]
+
+    def write_if(self, label: str) -> None:
+        full = self._full_label(label)
+        self.write_comment(f"if-goto {label}")
+        self._pop_to_d()
+        self.asm_lines += [f"@{full}", "D;JNE"]
+
+    # Function/Call/Return
+    def write_function(self, name: str, n_vars: int) -> None:
+        self.write_comment(f"function {name} {n_vars}")
+        # set current function context (used for labels inside function)
+        self.current_function = name
+        # function entry label
+        self.asm_lines.append(f"({name})")
+        # initialize n local vars to 0
+        for _ in range(n_vars):
+            self.asm_lines += ["@0", "D=A"]
+            self._push_d()
+
+    def write_call(self, name: str, n_args: int) -> None:
+        self.write_comment(f"call {name} {n_args}")
+        return_label = self._unique(f"RET_{name}")
+        # push return address
+        self.asm_lines += [f"@{return_label}", "D=A"]
+        self._push_d()
+        # push LCL, ARG, THIS, THAT
+        for reg in ("LCL", "ARG", "THIS", "THAT"):
+            self.asm_lines += [f"@{reg}", "D=M"]
+            self._push_d()
+        # ARG = SP - n_args - 5
+        self.asm_lines += ["@SP", "D=M", f"@{n_args + 5}", "D=D-A", "@ARG", "M=D"]
+        # LCL = SP
+        self.asm_lines += ["@SP", "D=M", "@LCL", "M=D"]
+        # goto function
+        self.asm_lines += [f"@{name}", "0;JMP"]
+        # return label
+        self.asm_lines.append(f"({return_label})")
+
+    def write_return(self) -> None:
+        self.write_comment("return")
+        # FRAME = LCL -> R13
+        self.asm_lines += ["@LCL", "D=M", "@R13", "M=D"]
+        # RET = *(FRAME - 5) -> R14
+        self.asm_lines += ["@R13", "D=M", "@5", "A=D-A", "D=M", "@R14", "M=D"]
+        # *ARG = pop()
+        self.asm_lines += ["@SP", "AM=M-1", "D=M", "@ARG", "A=M", "M=D"]
+        # SP = ARG + 1
+        self.asm_lines += ["@ARG", "D=M", "@SP", "M=D", "@SP", "M=M+1"]
+        # THAT = *(FRAME-1)
+        self.asm_lines += ["@R13", "AM=M-1", "D=M", "@THAT", "M=D"]
+        # THIS = *(FRAME-2)
+        self.asm_lines += ["@R13", "AM=M-1", "D=M", "@THIS", "M=D"]
+        # ARG = *(FRAME-3)
+        self.asm_lines += ["@R13", "AM=M-1", "D=M", "@ARG", "M=D"]
+        # LCL = *(FRAME-4)
+        self.asm_lines += ["@R13", "AM=M-1", "D=M", "@LCL", "M=D"]
+        # goto RET
+        self.asm_lines += ["@R14", "A=M", "0;JMP"]
+
+    def write_init(self) -> None:
+        self.write_comment("bootstrap")
+        # SP = 256
+        self.asm_lines += ["@256", "D=A", "@SP", "M=D"]
+        # call Sys.init
+        self.write_call("Sys.init", 0)
+
+    def write_to_file(self, asm_filename: str) -> None:
         if os.path.exists(asm_filename):
             if DEBUG:
                 print(f"Overwriting {asm_filename}")
@@ -235,30 +336,67 @@ class CodeWriter:
                 f.write(line + "\n")
 
 # Driver --------------------------------------------------------------------
-def translate_file(path: str) -> None:
-    with open(path, "r", encoding="utf-8") as f:
-        parser = VMParser(f)
-        writer = CodeWriter()
-        writer.set_file_name(path)
-        while parser.has_more_commands():
-            parser.advance()
-            if parser.current_command is None:
-                continue
-            t = parser.command_type()
-            if t == C_ARITHMETIC:
-                cmd = parser.arg1()
-                if cmd:
-                    writer.write_arithmetic(cmd)
-            elif t in (C_PUSH, C_POP):
-                parts = parser.current_command.split()
-                command, segment, index = parts[0], parts[1], int(parts[2])
-                writer.write_push_pop(command, segment, index)
-            else:
-                # Projekt 7 benötigt sonst nichts
-                writer.write_comment(f"unhandled: {parser.current_command}")
-        writer.write_to_file(path)
-        if DEBUG:
-            print(f"Translated {path} -> {path.replace('.vm', '.asm')}")
+def translate_files(files: list[str], output_asm: Optional[str] = None) -> None:
+    writer = CodeWriter()
+    # If multiple files target -> write bootstrap
+    if output_asm is not None and len(files) > 1:
+        writer.write_init()
+    elif output_asm is not None and any(True for _ in files):  # if directory mode we still want bootstrap
+        # In directory mode files>1 covered above. Keeping this line if desired to always bootstrap when output provided.
+        pass
+
+    for vm in files:
+        writer.set_file_name(vm)
+        with open(vm, "r", encoding="utf-8") as f:
+            parser = VMParser(f)
+            while parser.has_more_commands():
+                parser.advance()
+                if parser.current_command is None:
+                    continue
+                t = parser.command_type()
+                if t == C_ARITHMETIC:
+                    cmd = parser.arg1()
+                    if cmd:
+                        writer.write_arithmetic(cmd)
+                elif t in (C_PUSH, C_POP):
+                    parts = parser.current_command.split()
+                    command, segment, index = parts[0], parts[1], int(parts[2])
+                    writer.write_push_pop(command, segment, index)
+                elif t == C_LABEL:
+                    lbl = parser.arg1()
+                    if lbl:
+                        writer.write_label(lbl)
+                elif t == C_GOTO:
+                    lbl = parser.arg1()
+                    if lbl:
+                        writer.write_goto(lbl)
+                elif t == C_IF:
+                    lbl = parser.arg1()
+                    if lbl:
+                        writer.write_if(lbl)
+                elif t == C_FUNCTION:
+                    name = parser.arg1() or ""
+                    n = parser.arg2() or 0
+                    writer.write_function(name, n)
+                elif t == C_CALL:
+                    name = parser.arg1() or ""
+                    n = parser.arg2() or 0
+                    writer.write_call(name, n)
+                elif t == C_RETURN:
+                    writer.write_return()
+                else:
+                    writer.write_comment(f"unhandled: {parser.current_command}")
+
+    # write output
+    if output_asm is None and len(files) == 1:
+        out = files[0].replace(".vm", ".asm")
+    else:
+        out = output_asm
+    if out is None:
+        raise RuntimeError("No output filename specified")
+    writer.write_to_file(out)
+    if DEBUG:
+        print(f"Translated {len(files)} files -> {out}")
 
 def main() -> None:
     if len(sys.argv) < 2:
@@ -266,16 +404,21 @@ def main() -> None:
     else:
         path = sys.argv[1]
     files = []
+    output_asm = None
     if os.path.isdir(path):
-        files = [os.path.join(path, f) for f in os.listdir(path) if f.endswith(".vm")]
+        vm_files = sorted([os.path.join(path, f) for f in os.listdir(path) if f.endswith(".vm")])
+        files = vm_files
+        base = os.path.basename(os.path.normpath(path))
+        output_asm = os.path.join(path, base + ".asm")
     else:
         files = [path]
-    for vm in files:
-        try:
-            translate_file(vm)
-            print(f"Translated: {vm}")
-        except Exception as e:
-            print(f"Fehler bei {vm}: {e}")
+        output_asm = None
+
+    try:
+        translate_files(files, output_asm)
+        print(f"Translated: {len(files)} file(s)")
+    except Exception as e:
+        print(f"Fehler: {e}")
     input("Press Enter to continue...")
 
 if __name__ == "__main__":
