@@ -28,5 +28,5 @@
 *.yml linguist-detectable=true
 *.yml linguist-generated=false
 
-*.jack linguist-language=Jack
+*.jack linguist-language=Java
 *.jack linguist-detectable=true
