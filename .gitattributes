@@ -30,3 +30,8 @@
 
 *.jack linguist-language=Java
 *.jack linguist-detectable=true
+
+*.pyhtml linguist-language=PyHTML
+*.pyhtml linguist-detectable=true
+*.pyhtml linguist-generated=false
+*.pyhtml linguist-documentation=false
