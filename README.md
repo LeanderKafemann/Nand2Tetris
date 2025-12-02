@@ -3,7 +3,7 @@ Our solutions for Nand2Tetris,<br/>
 a project where you build your own pc from Nand gates.
 
 <!--
-Note that .vm files are counted as WebAssembly for GitHub linguist.
+Note that .vm files are counted as WebAssembly and .jack files as Java for GitHub linguist.
 -->
 
 ## Credits 
