@@ -1,0 +1,3 @@
+let zahl = Keyboard.readInt(”Gib eine Zahl ein: ”);
+do Output.printString( ”Deine Zahl ist ” );
+do Output.printInt( zahl );
