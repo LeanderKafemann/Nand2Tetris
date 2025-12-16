@@ -1,0 +1,12 @@
+class Math {
+	function int div(int a, int b) {
+		return a/b;
+	}
+	function void print_calc(int a, int a2, int b, int b2) {
+		do Output.printInt(a*b2 + b*a2);
+		do Output.printString("/");
+		do Output.printInt(a2*b2);
+		return ;
+	}
+		
+}
