@@ -53,10 +53,19 @@ class SquareGame {
             if (key = 81) {
                 let exit = true;
             }
+            if (key = 113) {
+                let exit = true;
+            }
             if (key = 90) {
                 do square.decSize();
             }
+            if (key = 122) {
+                do square.decSize();
+            }
             if (key = 88) {
+                do square.incSize();
+            }
+            if (key = 120) {
                 do square.incSize();
             }
             if (key = 131) {
@@ -65,10 +74,16 @@ class SquareGame {
             if (key = 119) {
                 let direction = 1;
             }
+            if (key = 87) {
+                let direction = 1;
+            }
             if (key = 133) {
                 let direction = 2;
             }
             if (key = 115) {
+                let direction = 2;
+            }
+            if (key = 83) {
                 let direction = 2;
             }
             if (key = 130) {
@@ -77,10 +92,16 @@ class SquareGame {
             if (key = 97)  {
                 let direction = 3;
             }
+            if (key = 65)  {
+                let direction = 3;
+            }
             if (key = 132) {
                 let direction = 4;
             }
             if (key = 100) {
+                let direction = 4;
+            }
+            if (key = 68) {
                 let direction = 4;
             }
 
@@ -113,3 +134,4 @@ class SquareGame {
         return;
     }
 }
+
