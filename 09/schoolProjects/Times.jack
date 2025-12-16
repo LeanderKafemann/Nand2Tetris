@@ -1,5 +1,5 @@
 class Times {
-	function int Times(int a, int b) {
+	function int times(int a, int b) {
 		return a*b;
 	}
 }
